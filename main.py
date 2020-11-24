@@ -1,23 +1,53 @@
-import client_bot
 import time
+import client_bot
 from datetime import datetime
+from datetime import timedelta
 
 cbot = client_bot.ClientBot('./key.cfg')
 bot = cbot.get_bot()
 
-start_of_day = datetime.now().strftime('%Y-%m-%d')
-get_12oclock_timestamp = int(time.mktime(datetime.strptime(start_of_day, '%Y-%m-%d').timetuple()))
-print(f'start_time: {get_12oclock_timestamp}')
-info_btc_usdt = bot.get_klines(symbol='BTCUSDT', interval=bot.KLINE_INTERVAL_1DAY)
-# info_btc_usdt = bot.get_historical_klines(symbol='BTCUSDT', interval=bot.KLINE_INTERVAL_1DAY, start_str='22 Nov 2020')
+'''
+response example
+[
+  [
+    1499040000000,      // Open time
+    "0.01634790",       // Open
+    "0.80000000",       // High
+    "0.01575800",       // Low
+    "0.01577100",       // Close
+    "148976.11427815",  // Volume
+    1499644799999,      // Close time
+    "2434.19055334",    // Quote asset volume
+    308,                // Number of trades
+    "1756.87402397",    // Taker buy base asset volume
+    "28.46694368",      // Taker buy quote asset volume
+    "17928899.62484339" // Ignore.
+  ]
+]
+'''
+
+def get_price_and_percentage_change(symbol, bot):
+    now = datetime.now()
+    now_timestamp = int(datetime.strptime(f'{now.year}-{now.month}-{now.day} {now.hour}:{now.minute}:{now.second}', '%Y-%m-%d %H:%M:%S').timestamp())
+    now_before_24hr = now - timedelta(hours=24)
+    now_before_timestamp = int(datetime.strptime(f'{now_before_24hr.year}-{now_before_24hr.month}-{now_before_24hr.day} {now_before_24hr.hour}:{now_before_24hr.minute}:{now_before_24hr.second}', '%Y-%m-%d %H:%M:%S').timestamp())
+    klines = bot.get_historical_klines(symbol=symbol, interval=bot.KLINE_INTERVAL_1MINUTE, start_str=str(now_before_timestamp), end_str=str(now_timestamp))
+    # print(f'started from {klines[1][0]}')
+    print(f'converted start time: {datetime.fromtimestamp(klines[0][0] / 1000)}')
+    # print(f'ended in {klines[-1][0]}')
+    print(f'converted end time: {datetime.fromtimestamp(klines[-1][0] / 1000)}')
+
+    # count price change percentage
+    percentage = ((float(klines[-1][4]) - float(klines[0][4])) / float(klines[0][4])) * 100
+    print(f'{symbol} first close price: {klines[0][4]}')
+    print(f'{symbol} latest close price: {klines[-1][4]}')
+    print(f'{symbol} price changes: {percentage}')
+    time.sleep(3)
 
 
-
-kline_open_time = info_btc_usdt[-1][0]
-converted_open_time = datetime.fromtimestamp(kline_open_time/1000)
-
-print(f'klines: {info_btc_usdt}')
-print(info_btc_usdt[-1])
-print(converted_open_time)
-# print(start_of_day)
-
+get_price_and_percentage_change('BTCUSDT', bot)
+get_price_and_percentage_change('ETHUSDT', bot)
+get_price_and_percentage_change('BNBUSDT', bot)
+get_price_and_percentage_change('XRPUSDT', bot)
+get_price_and_percentage_change('BCHUSDT', bot)
+get_price_and_percentage_change('LTCUSDT', bot)

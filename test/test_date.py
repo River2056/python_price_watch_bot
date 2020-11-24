@@ -1,8 +1,8 @@
 from datetime import datetime
+from datetime import timedelta
 import time
 
-now = datetime.now().strftime('%Y-%m-%d')
-print(now)
-
-now_12oclock_timestamp = int(time.mktime(datetime.strptime(now, '%Y-%m-%d').timetuple()))
-print(now_12oclock_timestamp)
+now = datetime.now()
+print(f'now: {now}')
+now_before_24hr = now - timedelta(hours=24)
+print(f'24 hours ago: {now_before_24hr}')
