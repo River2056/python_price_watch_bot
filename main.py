@@ -29,9 +29,9 @@ response example
 def get_price_and_percentage_change(symbol, bot):
     now = datetime.now()
     now_timestamp = int(datetime.strptime(f'{now.year}-{now.month}-{now.day} {now.hour}:{now.minute}:{now.second}', '%Y-%m-%d %H:%M:%S').timestamp())
-    now_before_24hr = now - timedelta(hours=24)
-    now_before_timestamp = int(datetime.strptime(f'{now_before_24hr.year}-{now_before_24hr.month}-{now_before_24hr.day} {now_before_24hr.hour}:{now_before_24hr.minute}:{now_before_24hr.second}', '%Y-%m-%d %H:%M:%S').timestamp())
-    klines = bot.get_historical_klines(symbol=symbol, interval=bot.KLINE_INTERVAL_1MINUTE, start_str=str(now_before_timestamp), end_str=str(now_timestamp))
+    now_24hrs_ago = now - timedelta(hours=24)
+    now_ago_timestamp = int(datetime.strptime(f'{now_24hrs_ago.year}-{now_24hrs_ago.month}-{now_24hrs_ago.day} {now_24hrs_ago.hour}:{now_24hrs_ago.minute}:{now_24hrs_ago.second}', '%Y-%m-%d %H:%M:%S').timestamp())
+    klines = bot.get_historical_klines(symbol=symbol, interval=bot.KLINE_INTERVAL_1MINUTE, start_str=str(now_ago_timestamp), end_str=str(now_timestamp))
     # print(f'started from {klines[1][0]}')
     print(f'converted start time: {datetime.fromtimestamp(klines[0][0] / 1000)}')
     # print(f'ended in {klines[-1][0]}')
